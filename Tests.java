@@ -6,6 +6,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -130,7 +132,10 @@ public class Tests {
 		Assert.assertEquals(driver.findElement(By.cssSelector("#cart")).getText(), "2 item(s) - $725.20");
 		driver.findElement(By.cssSelector("#cart")).click();
 		//Thread.sleep(2000); // For demonstration
-		Thread.sleep(500); //maybe Error
+//Wait when web element will be visible
+		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		(new WebDriverWait(driver, 10)).until(ExpectedConditions.visibilityOfElementLocated(By.linkText("View Cart")));
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 //Check if the tax is counted correctly
 		Assert.assertEquals(driver
 			.findElement(By.cssSelector(
@@ -208,13 +213,13 @@ public class Tests {
 //Open Login page
 		driver.findElement(By.linkText("My Account")).click();
 //Input logged data
-		Thread.sleep(2000); // For demonstration
+		//Thread.sleep(2000); // For demonstration
 		driver.findElement(By.id("input-email")).clear();	
 		driver.findElement(By.id("input-email")).sendKeys("YuraStasiv@hotmail.com");
 		driver.findElement(By.id("input-password")).clear();
 		driver.findElement(By.id("input-password")).sendKeys("Q1w2e3r4" + Keys.ENTER);
 		System.out.println(ststus1 + "Login succesful...");
-		Thread.sleep(2000); // For demonstration
+		//Thread.sleep(2000); // For demonstration
 
 //Clear cart // перепитати чи можна вит€гнути ск≥льки елемент≥в в tb
 			 // точнити €к реал≥зувати цей момент
@@ -228,12 +233,16 @@ public class Tests {
 //Add MacBook to cart
 		driver.findElement(By.linkText("MacBook")).click();
 		driver.findElement(By.cssSelector("#button-cart")).click();
-		Thread.sleep(500);
+//Wait when web element will be visible
+		driver.findElement(By.cssSelector("#cart")).click();
+		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		(new WebDriverWait(driver, 10)).until(ExpectedConditions.visibilityOfElementLocated(By.linkText("View Cart")));
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.findElement(By.cssSelector("#cart")).click();
 		Assert.assertEquals(driver.findElement(By.cssSelector("#cart")).getText(), "1 item(s) - $500.00");
 		System.out.println(ststus1 + "McBook was added to cart...");
-		Thread.sleep(2000); // For demonstration
+		//Thread.sleep(2000); // For demonstration
 //Log out and sign in again
-		Thread.sleep(500);
 		driver.findElement(By.linkText("My Account")).click();
 		driver.findElement(By.linkText("Logout")).click();
 		System.out.println(ststus1 + "Logout succesful...");
