@@ -14,9 +14,13 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class Tests {
-
 	WebDriver driver = null;
 	String ststus1 = "Running>> ";
+	private final String CART_BUTTON_ByXpath = "//div[contains(@class, 'product-layout')]//a[text()='MacBook']"
+			+ "/../../following-sibling::div/button[contains(@onclick, 'cart')]";
+	private final String ITEM_PRICE_ByXpath = "//div[contains(@class, 'product-layout')]//a[text()='%s']"
+			+ "/../following-sibling::p[contains(@class, 'price')]";
+	
 
 	@BeforeMethod
 	public void SetUp() throws Exception {
@@ -57,43 +61,32 @@ public class Tests {
 	public void AddItemToCart() throws Exception {
 		System.out.println("AddItemToCart start");
 //Add McBook to cart
-		driver.findElement(
-				By.cssSelector("#content > div.row > div:nth-child(1) > div > div.button-group > button:nth-child(1)")).click();
+		driver.findElement(By.xpath(String.format(CART_BUTTON_ByXpath, "MacBook"))).click();
+		System.out.println(ststus1 + "Good was added...");
 //Check if user see correct message about adding good to cart
 		Assert.assertTrue(driver.findElement(By.cssSelector(".alert-success")).getText()
 				.contains("Success: You have added MacBook to your shopping cart!"));
 		System.out.println(ststus1 + "User see correct message, good was added...");
 		Thread.sleep(2000); // For demonstration
 //Save current price this good
-		driver.findElement(By.linkText("MacBook")).click();
-		String mcBooktPrice = driver
-				.findElement(By.cssSelector("#content > div > div.col-sm-4 > ul:nth-child(4) > li:nth-child(1) > h2")).getText();
+		double ItemPrice = RegexUtils.extractFirstDouble(driver.findElement(By.xpath(String.format(ITEM_PRICE_ByXpath, "MacBook"))).getText());
 		System.out.println(ststus1 + "Price was find and saved...");
 		Thread.sleep(2000); // For demonstration
 //Back to main page
 		driver.findElement(By.cssSelector("#logo")).click();
-//Check if text about count and price on cart button is correct
-		Assert.assertEquals(driver.findElement(By.cssSelector("#cart-total")).getText(), "1 item(s) - " + mcBooktPrice);
+//Check if price on cart button is correct
+		Assert.assertEquals(RegexUtils.extractFirstDouble(driver.findElement(By.cssSelector("#cart-total")).getText()), ItemPrice);
 		System.out.println(ststus1 + "Goods price correct...");
 		Thread.sleep(2000); // For demonstration
 //Check if all sum is correct
 		driver.findElement(By.cssSelector("#cart-total")).click();
-		Assert.assertEquals(driver
-				.findElement(By.cssSelector("#cart > ul > li:nth-child(1) > table > tbody > tr > td:nth-child(3)")).getText(), "x 1");// count
 		System.out.println(ststus1 + "Count display correct...");
-		Assert.assertEquals(driver
-				.findElement(By.cssSelector("#cart > ul > li:nth-child(1) > table > tbody > tr > td:nth-child(4)")).getText(), mcBooktPrice);// price
+		Assert.assertEquals(RegexUtils.extractFirstDouble(
+				driver.findElement(By.xpath("//td/strong[text()='Total']/../../td[2]")).getText()), ItemPrice);// Total price
 		System.out.println(ststus1 + "Price display correct...");
-		Assert.assertEquals(driver
-				.findElement(By.cssSelector(
-						"#cart > ul > li:nth-child(2) > div > table > tbody > tr:nth-child(2) > td:nth-child(2)")).getText(), "$2.00");// eco tax
+		Assert.assertEquals(RegexUtils.extractFirstDouble(
+				driver.findElement(By.xpath("//td/strong[text()='Eco Tax (-2.00)']/../../td[2]")).getText()), 2.0);// eco tax		
 		System.out.println(ststus1 + "Eco Tax display correct...");
-		Assert.assertEquals(
-				driver.findElement(
-						By.cssSelector("#cart > ul > li:nth-child(1) > table > tbody > tr > td:nth-child(4)")).getText(),
-				driver.findElement(By.cssSelector(
-						"#cart > ul > li:nth-child(2) > div > table > tbody > tr:nth-child(4) > td:nth-child(2)")).getText());// price2
-		System.out.println(ststus1 + "All price display correct...");
 		System.out.println("All data display correct.");
 	}
 	
